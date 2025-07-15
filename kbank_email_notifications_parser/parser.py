@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from datetime import datetime
 from dataclasses import dataclass
@@ -120,13 +121,14 @@ class TransactionFactory:
 class Parser:
     def __init__(self, tf: TransactionFactory):
         self.tf = tf
+        self._logger = logging.getLogger(self.__class__.__name__)
 
     def parse(self, body):
         databag = self.process_body(body)
         try:
             return self.tf.construct(databag)
         except Exception as e:
-            print(databag)
+            self._logger.warning("Failed to parse. databag: %s" % str(databag))
             raise e
 
     def get_relevant_lines(self, body):
